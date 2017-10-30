@@ -1,8 +1,13 @@
 import java.util.concurrent.locks.Lock;
 
 public interface FixnumLock extends Lock{
-    long getId();
-    boolean register(Thread thread);
-    boolean unregister(Thread thread);
+    int getId();
+
+    boolean register();
+    boolean unregister();
+
+    void lock(int id);
+    void unlock(int id);
+
     void reset();
 }

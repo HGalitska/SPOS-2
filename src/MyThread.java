@@ -1,19 +1,21 @@
 public class MyThread extends Thread {
-    static Mutex m = new Mutex(2);
+    static AbstractFixnumLock m = new FixnumLockDemo(5);
 
     @Override
     public synchronized void run() {
-        System.out.println(Thread.currentThread().getId() + "...is running.");
+        System.out.println(Thread.currentThread().getId() + " is running.");
 
-        m.register(this);
-        m.lock();
+        boolean registered = m.register();
+        if (registered) {
+            m.lock();
+        }
         try {
             sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        m.unlock();
+        if(registered) m.unlock();
 
     }
 }

@@ -8,4 +8,4 @@ Used Lock interfase as a base, added 4 new methods:
 	reset() - resets lock's state to initial
 
 Logic for methods is provided in abstract class AbstractFixnumLock. This class implements Lock's methods (mainly lock() and unlock()) as well.
-Class Mutex extends class AbstractFixnumLock, that is creates a new FixnumLock instance, to serve fixed number of threads.
+Class FixnumLockDemo extends class AbstractFixnumLock, that is creates a new FixnumLock instance, to serve fixed number of threads.
