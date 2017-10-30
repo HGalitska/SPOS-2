@@ -1,7 +1,3 @@
-public class Mutex extends FLock{
-
-    Mutex(int n) {
-        numberOfThreads = n;
-    }
+public class Mutex extends AbstractFixnumLock {
 
 }

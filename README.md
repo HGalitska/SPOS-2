@@ -7,5 +7,5 @@ Used Lock interfase as a base, added 4 new methods:
 	unregister() - opposite to register()
 	reset() - resets lock's state to initial
 
-Logic for methods is provided in abstract class FLock. This class implements Lock's methods (mainly lock() and unlock()) as well.
-Class Mutex extends class FLock, that is creates a new FixnumLock instance, to serve fixed number of threads.
+Logic for methods is provided in abstract class AbstractFixnumLock. This class implements Lock's methods (mainly lock() and unlock()) as well.
+Class Mutex extends class AbstractFixnumLock, that is creates a new FixnumLock instance, to serve fixed number of threads.

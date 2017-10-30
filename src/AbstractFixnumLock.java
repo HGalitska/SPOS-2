@@ -3,12 +3,16 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 
-public abstract class FLock implements FixnumLock{
+public abstract class AbstractFixnumLock implements FixnumLock{
     public int numberOfThreads = 2;                 //fixed number of threads that can lock this lock
     List<Thread> registered = new ArrayList();      //list of registered threads (threads, that can lock this lock)
 
     private long locker = -1;                       //id of the thread, that is currently locking a lock
 
+
+    AbstractFixnumLock(int n) {
+        numberOfThreads = n;
+    }
 
     public synchronized boolean isLocked() {
         return locker != -1;
