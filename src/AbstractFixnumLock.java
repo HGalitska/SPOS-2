@@ -21,11 +21,11 @@ public abstract class AbstractFixnumLock implements FixnumLock{
 
     //-------------------------------------------- helping methods
 
-    private synchronized boolean isLocked() {
+    private boolean isLocked() {
         return locker != -1;
     }
 
-    private synchronized boolean isRegistered(int id) {
+    private boolean isRegistered(int id) {
         return indices.get(id);
     }
 
