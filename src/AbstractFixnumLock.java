@@ -7,7 +7,7 @@ public abstract class AbstractFixnumLock implements FixnumLock{
 
     private ThreadLocal<Integer> ID = new ThreadLocal<>();  // id of every registered thread
     private BitSet indices = new BitSet(numberOfThreads);   // indicates which indices are free (that is free ids for registering threads)
-    private long locker = -1;                               // id of the thread, that is currently locking a lock
+    private int numberOfSetIDs = 0;
 
 
     //-------------------------------------------- constructors
@@ -16,100 +16,60 @@ public abstract class AbstractFixnumLock implements FixnumLock{
     AbstractFixnumLock(int n) {
         numberOfThreads = n;
         indices = new BitSet(numberOfThreads);
-        ID.set(-1);
-    }
-
-    //-------------------------------------------- helping methods
-
-    private boolean isLocked() {
-        return locker != -1;
-    }
-
-    private boolean isRegistered(int id) {
-        return indices.get(id);
     }
 
     //-------------------------------------------- methods of FixnumLock interface
 
     @Override
     public int getId() {
-        return ID.get();
+        return register();
     }
 
     @Override
-    public boolean register(){
+    public synchronized int register(){
         Thread thread = Thread.currentThread();
 
-        if (/*indices.size() == numberOfThreads && */indices.cardinality() < numberOfThreads) {
-            int freeID = indices.nextClearBit(0);
-            indices.set(freeID);
-            ID.set(freeID);
+        if (ID.get() != null && ID.get() != -1) return ID.get();           //thread is already registered
 
-            System.out.println("Thread " + thread.getId() + " has been registered as " + getId());
-            return true;
+        if (numberOfSetIDs < numberOfThreads) {
+            int freeID;
+            synchronized (this) {
+                freeID = indices.nextClearBit(0);
+                indices.set(freeID);
+                ID.set(freeID);
+                numberOfSetIDs += 1;
+
+                System.out.println("Thread " + thread.getId() + " has been registered as " + freeID + ".");
+            }
+            return freeID;
         }
         System.out.println("Couldn't register thread " + thread.getId());
-        return false;
+        return -1;
     }
 
     @Override
-    public boolean unregister(){
+    public synchronized int unregister(){
         Thread thread = Thread.currentThread();
         int threadID = getId();
 
         if (indices.get(threadID)) {
-            indices.clear(threadID);
-            ID.set(0);
+            synchronized (this) {
+                indices.clear(threadID);
+                numberOfSetIDs -= 1;
+                ID.set(-1);
 
-            System.out.println("Thread " + thread.getId() + " has been unregistered.");
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public synchronized void lock(int id) {
-        if (!isRegistered(id)) {
-            System.out.println(id +  " is not registered.");
-            return;
-        }
-
-        if (locker == id) {
-            System.out.println("Lock has already been acquired.");
-        }
-
-        while(isLocked()){
-            System.out.println("Thread " + id + " is waiting for lock." + " (" + Thread.currentThread().getId() + ")");
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("Thread " + thread.getId() + " has been unregistered. ID " + threadID + " is free.");
             }
+            return threadID;
         }
-        locker = id;
-        System.out.println("Lock is used by thread " + locker + " (" + Thread.currentThread().getId() + ")");
+        return -1;
     }
 
     @Override
-    public synchronized void unlock(int id) {
-        if (!isLocked()) {
-            System.out.println("Lock is not locked.");
-            return;
-        }
-        if (id != locker){
-            System.out.println(id + " can't unlock this lock.");
-            return;
-        }
-        System.out.println("Lock is unlocked by " + locker);
-        locker = -1;
-        notify();
-    }
-
-    @Override
-    public void reset() {
+    public synchronized void reset() {
         indices.clear();
-        locker = -1;
-        numberOfThreads = 2;
+        numberOfSetIDs = 0;
+        System.out.println("\nFixnumLock is reset.");
     }
 
     //-------------------------------------------- methods of Lock interface
