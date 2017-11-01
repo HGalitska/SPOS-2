@@ -1,3 +1,4 @@
+import java.rmi.NoSuchObjectException;
 import java.util.BitSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -7,7 +8,7 @@ public abstract class AbstractFixnumLock implements FixnumLock{
 
     private ThreadLocal<Integer> ID = new ThreadLocal<>();  // id of every registered thread
     private BitSet indices = new BitSet(numberOfThreads);   // indicates which indices are free (that is free ids for registering threads)
-    private int numberOfSetIDs = 0;
+    public int numberOfSetIDs = 0;
 
 
     //-------------------------------------------- constructors
@@ -66,7 +67,7 @@ public abstract class AbstractFixnumLock implements FixnumLock{
     }
 
     @Override
-    public synchronized void reset() {
+    public void reset() {
         indices.clear();
         numberOfSetIDs = 0;
         System.out.println("\nFixnumLock is reset.");
@@ -103,6 +104,11 @@ public abstract class AbstractFixnumLock implements FixnumLock{
 
     @Override
     public Condition newCondition() {
+        try {
+            throw new NoSuchObjectException("Condition is not supported.");
+        } catch (NoSuchObjectException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
