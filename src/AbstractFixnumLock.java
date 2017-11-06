@@ -23,6 +23,7 @@ public abstract class AbstractFixnumLock implements FixnumLock{
 
     @Override
     public int getId() {
+        if (ID.get() != null && ID.get() != -1) return ID.get();
         return register();
     }
 
@@ -67,12 +68,14 @@ public abstract class AbstractFixnumLock implements FixnumLock{
     }
 
     @Override
-    public void reset() {
+    public synchronized void reset(int number) {
+        numberOfThreads = number;
+
+        ID = new ThreadLocal<>();
         indices.clear();
         numberOfSetIDs = 0;
         System.out.println("\nFixnumLock is reset.");
     }
-
     //-------------------------------------------- methods of Lock interface
 
     @Override
